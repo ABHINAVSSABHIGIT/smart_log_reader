@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "smart-log-reader"
+version = "1.0.0"
+description = "Intelligent, extensible log reader and analyzer with color-coded output and smart error grouping."
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.8"
+authors = [{name = "ABHINAVSS", email='abhinavssabhi123@gmail.com'}]
+keywords = ["log", "parser", "analyzer", "cli", "devops"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: System :: Logging",
+    "Topic :: Utilities",
+    "Environment :: Console",
+]
+dependencies = [
+    "typer[all]>=0.9",
+    "rich>=13.0",
+    "python-dateutil>=2.8",
+    "rapidfuzz>=3.0",
+]
+
+[project.scripts]
+smart-log-reader = "smart_log_reader.cli:app"
+
+[tool.setuptools.packages.find]
+include = ["smart_log_reader*"]
