@@ -284,7 +284,6 @@ class MariaDBParser(MySQLParser):
     name = "mariadb"
 
 
-# ---------- Generic fallback ----------
 class GenericParser(BaseParser):
     name = "generic"
     # Tries a very broad pattern: optional timestamp, optional level, message
@@ -326,7 +325,6 @@ class JSONLineParser(BaseParser):
             obj = json.loads(s)
         except json.JSONDecodeError:
             return None
-        # Try common field names
         ts_raw = obj.get("timestamp") or obj.get("time") or obj.get("@timestamp") or obj.get("asctime") or ""
         level = obj.get("level") or obj.get("levelname") or obj.get("severity") or "INFO"
         msg = obj.get("message") or obj.get("msg") or obj.get("text") or s
@@ -341,4 +339,4 @@ class JSONLineParser(BaseParser):
         )
 
     def is_continuation(self, line: str) -> bool:
-        return False  # every JSON line is standalone
+        return False

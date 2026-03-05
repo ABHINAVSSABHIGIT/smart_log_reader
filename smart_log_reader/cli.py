@@ -63,52 +63,50 @@ def version_callback(value):
 
 @app.command()
 def main(
-    file: Path = typer.Option(..., "--file", "-f", help="Path to the log file."),
-    log_type: str = typer.Option("auto", "--log-type", "-t",
-                                 help=f"Log format: {', '.join(LOG_TYPES)}"),
-    level: str = typer.Option("ALL", "--level", "-l",
-                               help=f"Filter by level: {', '.join(LEVELS)}"),
-    keyword: Optional[str] = typer.Option(None, "--keyword", "-k",
-                                           help="Keyword or regex filter."),
-    start_time: Optional[str] = typer.Option(None, "--start-time", "-s",
-                                              help="Start time filter. (YYYY-MM-DD HH:MM:SS)"),
-    end_time: Optional[str] = typer.Option(None, "--end-time", "-e",
-                                            help="End time filter. (YYYY-MM-DD HH:MM:SS)"),
-    export: str = typer.Option("none", "--export", "-x",
-                                help=f"Export format: {', '.join(EXPORT_FORMATS)}"),
-    output: Optional[Path] = typer.Option(
-        None, "--output", "-o",
-        help="Custom output path. Defaults to ~/.smart-log-reader/reports/<name>_<ts>.<ext>",
-    ),
-    group_errors: bool = typer.Option(True, "--group-errors/--no-group-errors", "-g",
-                                       help="Enable error grouping."),
-    color: bool = typer.Option(True, "--color/--no-color", help="Color output."),
-
-    # ── serving flags ─────────────────────────────────────────────────────────
-    serve: bool = typer.Option(
-        False, "--serve",
-        help=(
-            "After HTML export, start a localhost-only HTTP server. "
-            "Access via SSH tunnel: ssh -L <port>:127.0.0.1:<port> user@server"
+        file: Path = typer.Option(..., "--file", "-f", help="Path to the log file."),
+        log_type: str = typer.Option("auto", "--log-type", "-t",
+                                     help=f"Log format: {', '.join(LOG_TYPES)}"),
+        level: str = typer.Option("ALL", "--level", "-l",
+                                  help=f"Filter by level: {', '.join(LEVELS)}"),
+        keyword: Optional[str] = typer.Option(None, "--keyword", "-k",
+                                              help="Keyword or regex filter."),
+        start_time: Optional[str] = typer.Option(None, "--start-time", "-s",
+                                                 help="Start time filter. (YYYY-MM-DD HH:MM:SS)"),
+        end_time: Optional[str] = typer.Option(None, "--end-time", "-e",
+                                               help="End time filter. (YYYY-MM-DD HH:MM:SS)"),
+        export: str = typer.Option("none", "--export", "-x",
+                                   help=f"Export format: {', '.join(EXPORT_FORMATS)}"),
+        output: Optional[Path] = typer.Option(
+            None, "--output", "-o",
+            help="Custom output path. Defaults to ~/.smart-log-reader/reports/<name>_<ts>.<ext>",
         ),
-    ),
-    serve_public: bool = typer.Option(
-        False, "--serve-public",
-        help=(
-            "[INSECURE — LAN/VPN only] Bind to 0.0.0.0 with a one-time token. "
-            "Use only inside a trusted network. Never on a public internet-facing server."
-        ),
-    ),
-    port: int = typer.Option(0, "--port", "-p",
-                              help="Port for --serve / --serve-public (0 = auto)."),
+        group_errors: bool = typer.Option(True, "--group-errors/--no-group-errors", "-g",
+                                          help="Enable error grouping."),
+        color: bool = typer.Option(True, "--color/--no-color", help="Color output."),
 
-    version: Optional[bool] = typer.Option(None, "--version", "-v",
-                                            callback=version_callback, is_eager=True),
+        serve: bool = typer.Option(
+            False, "--serve",
+            help=(
+                    "After HTML export, start a localhost-only HTTP server. "
+                    "Access via SSH tunnel: ssh -L <port>:127.0.0.1:<port> user@server"
+            ),
+        ),
+        serve_public: bool = typer.Option(
+            False, "--serve-public",
+            help=(
+                    "[INSECURE — LAN/VPN only] Bind to 0.0.0.0 with a one-time token. "
+                    "Use only inside a trusted network. Never on a public internet-facing server."
+            ),
+        ),
+        port: int = typer.Option(0, "--port", "-p",
+                                 help="Port for --serve / --serve-public (0 = auto)."),
+
+        version: Optional[bool] = typer.Option(None, "--version", "-v",
+                                               callback=version_callback, is_eager=True),
 ):
     """Parse, analyze, and display log files with smart error grouping."""
     console = Console(force_terminal=color, no_color=not color)
 
-    # ── validation ─────────────────────────────────────────────────────────────
     if not file.exists():
         console.print(f"[red]Error: File not found: {file}[/red]")
         raise typer.Exit(1)
@@ -130,7 +128,6 @@ def main(
         console.print("[red]Use either --serve (localhost) or --serve-public, not both.[/red]")
         raise typer.Exit(1)
 
-    # ── parse & filter ─────────────────────────────────────────────────────────
     fmt = log_type if log_type != "auto" else detect_format(str(file))
     console.print(f"[dim]Using parser: {fmt}[/dim]")
 
@@ -140,8 +137,8 @@ def main(
 
     with open(file, "r", errors="replace") as fh:
         raw_entries = parser.stream_entries(fh)
-        filtered    = filter_entries(raw_entries, level=level, keyword=keyword,
-                                     start_time=st, end_time=et)
+        filtered = filter_entries(raw_entries, level=level, keyword=keyword,
+                                  start_time=st, end_time=et)
         entries = list(filtered)
 
     if not entries:
@@ -150,10 +147,8 @@ def main(
 
     result = analyze(entries, do_group=group_errors, detected_format=fmt)
 
-    # ── terminal display ───────────────────────────────────────────────────────
     display(result, console=console)
 
-    # ── export ─────────────────────────────────────────────────────────────────
     if export == "none":
         return
 
@@ -168,7 +163,7 @@ def main(
         from .html_export import export_html, serve_html, prune_old_reports
 
         export_html(result, out_path)
-        prune_old_reports(keep=20)   # keep the last 20 reports, silently drop older ones
+        prune_old_reports(keep=20)  # keep the last 20 reports, silently drop older ones
         console.print(f"\n[bold green]Exported HTML →[/bold green] {out_path}")
         console.print(f"[dim]Reports folder: {out_path.parent}[/dim]")
 

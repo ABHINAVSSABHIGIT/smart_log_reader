@@ -15,7 +15,6 @@ class LogEntry:
     message: str = ""
     full_entry: str = ""
     line_number: int = 0
-    # set during analysis
     category: str = ""
     occurrence_count: int = 1
 

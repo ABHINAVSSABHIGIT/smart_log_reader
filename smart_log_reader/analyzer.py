@@ -77,7 +77,6 @@ def group_errors(entries: list[LogEntry], threshold: int = SIMILARITY_THRESHOLD)
             groups.append(g)
             entry.category = core[:80]
 
-    # Back-fill occurrence counts
     for g in groups:
         for e in g.entries:
             e.occurrence_count = g.count

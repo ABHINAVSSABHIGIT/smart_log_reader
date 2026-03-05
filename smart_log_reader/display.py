@@ -17,7 +17,6 @@ LEVEL_STYLE = {
 def display(result: AnalysisResult, console: Console | None = None, max_lines: int = 200) -> None:
     c = console or Console()
 
-    # ---- Summary table ----
     tbl = Table(title="Log Analysis Summary", show_header=True, header_style="bold cyan")
     tbl.add_column("Metric", style="bold")
     tbl.add_column("Value", justify="right")
@@ -32,13 +31,11 @@ def display(result: AnalysisResult, console: Console | None = None, max_lines: i
         tbl.add_row("Time Range", f"{result.time_span_start} → {result.time_span_end}")
     c.print(tbl)
 
-    # ---- Grouped errors ----
     if result.error_groups:
         c.print("\n[bold red]Error Groups (by frequency):[/bold red]")
         for i, g in enumerate(result.error_groups[:20], 1):
             c.print(f"  [bold white]#{i}[/bold white] [red]×{g.count}[/red]  {g.core_issue[:120]}")
 
-    # ---- Log lines ----
     c.print(f"\n[bold]Log Entries (showing up to {max_lines}):[/bold]\n")
     for entry in result.entries[:max_lines]:
         style = LEVEL_STYLE.get(entry.level, "white")
