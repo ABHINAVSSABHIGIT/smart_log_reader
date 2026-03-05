@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "smart-log-reader"
-version = "1.0.0"
+version = "1.0.1"
 description = "Intelligent, extensible log reader and analyzer with color-coded output and smart error grouping."
 readme = "README.md"
 license = {text = "MIT"}
